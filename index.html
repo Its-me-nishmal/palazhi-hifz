@@ -83,7 +83,7 @@
             width: 420px;
             height: 420px;
             margin: 2rem auto;
-            padding: 1.5rem;
+            padding: 1rem;
             background: #f9fafb;
             border-radius: 1rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -94,39 +94,42 @@
             background-size: 22px 22px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
             overflow: hidden;
         }
         .poster-container .logo {
-            height: 40px;
-            margin-bottom: 0.5rem;
+            width: 50px;
+            height: 50px;
+            margin: 0.5rem auto;
         }
         .congrats {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #0f766e;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin: 0.3rem 0;
+            line-height: 1.2;
         }
         .subtitle {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #475569;
-            margin-bottom: 0.8rem;
+            margin: 0.3rem 0;
+            line-height: 1.2;
+            padding: 0 1rem;
         }
         .photo-frame {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0.8rem 0;
+            margin: 0.5rem 0;
             padding: 4px;
             border-radius: 0.75rem;
             background: linear-gradient(to right, #0ea5e9, #2dd4bf);
             width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
         }
         .student-photo {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
             border-radius: 0.5rem;
             border: 3px solid #ffffff;
@@ -134,10 +137,10 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .institute-info {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #64748b;
             font-style: italic;
-            margin-top: 0.8rem;
+            margin: 0.5rem 0;
             line-height: 1.2;
         }
         /* Ensure poster styles are consistent on mobile */
@@ -146,7 +149,7 @@
                 width: 420px;
                 height: 420px;
                 margin: 1rem auto;
-                padding: 1.5rem;
+                padding: 1rem;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
                 border: 1px solid #e5e7eb;
                 background-image: linear-gradient(135deg, #ffffff 25%, #f3f4f6 25%, #f3f4f6 50%, #ffffff 50%, #ffffff 75%, #f3f4f6 75%);
@@ -157,25 +160,31 @@
                 transform: translateX(-50%);
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: space-between;
+                align-items: center;
                 overflow: hidden;
             }
             .poster-container .logo {
-                height: 40px;
-                margin-bottom: 0.5rem;
+                width: 50px;
+                height: 50px;
+                margin: 0.5rem auto;
             }
             .congrats {
-                font-size: 1.1rem;
+                font-size: 1rem;
+                line-height: 1.2;
             }
             .subtitle {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
+                line-height: 1.2;
+                padding: 0 1rem;
             }
             .student-photo {
-                width: 90px;
-                height: 90px;
+                width: 80px;
+                height: 80px;
             }
             .institute-info {
-                font-size: 0.7rem;
+                font-size: 0.65rem;
+                line-height: 1.2;
             }
         }
     </style>
@@ -348,30 +357,57 @@
                 </div>
             `;
 
-            // Ensure poster renders off-screen to avoid visual flicker
+            // Render off-screen to avoid flicker
             posterDiv.style.position = 'fixed';
             posterDiv.style.left = '-9999px';
             document.body.appendChild(posterDiv);
 
-            // Force a reflow to ensure content is rendered before capture
-            posterDiv.offsetHeight;
+            // Wait for images to load
+            const images = posterDiv.querySelectorAll('img');
+            let loadedImages = 0;
+            const totalImages = images.length;
 
-            html2canvas(posterDiv, {
-                scale: 1.5,
-                useCORS: true,
-                logging: false,
-                width: 420,
-                height: 420 // Explicitly set to ensure square output
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${studentName}_congratulations_poster.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                document.body.removeChild(posterDiv);
-            }).catch(error => {
-                console.error('Error generating poster:', error);
-                document.body.removeChild(posterDiv);
-            });
+            const renderCanvas = () => {
+                // Force reflow
+                posterDiv.offsetHeight;
+
+                html2canvas(posterDiv, {
+                    scale: 1.5,
+                    useCORS: true,
+                    logging: false,
+                    width: 420,
+                    height: 420
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `${studentName}_congratulations_poster.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    document.body.removeChild(posterDiv);
+                }).catch(error => {
+                    console.error('Error generating poster:', error);
+                    document.body.removeChild(posterDiv);
+                });
+            };
+
+            if (totalImages === 0) {
+                renderCanvas();
+            } else {
+                images.forEach(img => {
+                    img.onload = () => {
+                        loadedImages++;
+                        if (loadedImages === totalImages) {
+                            renderCanvas();
+                        }
+                    };
+                    img.onerror = () => {
+                        console.error(`Failed to load image: ${img.src}`);
+                        loadedImages++;
+                        if (loadedImages === totalImages) {
+                            renderCanvas();
+                        }
+                    };
+                });
+            }
         }
 
         function logout() {
