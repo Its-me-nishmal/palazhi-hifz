@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Madrasa Result Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Custom animations */
         @keyframes fadeIn {
@@ -64,9 +64,12 @@
         }
         /* Logo styling */
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             object-fit: contain;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -78,6 +81,56 @@
         ::-webkit-scrollbar-thumb {
             background: #64748b;
             border-radius: 3px;
+        }
+        /* Poster styles */
+        .poster-container {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #1f2937;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            width: 400px; /* Compact size */
+            background-image: linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 50%, #f8fafc 50%, #f8fafc 75%, transparent 75%, transparent); /* Subtle pattern */
+            background-size: 20px 20px;
+        }
+        .poster-container img.student-photo {
+            object-fit: contain; /* Preserve original dimensions */
+            margin: 0.75rem auto;
+            border: 3px solid transparent;
+            border-radius: 0.5rem;
+            display: block;
+            background: linear-gradient(to right, #0d9488, #2dd4bf); /* Gradient border */
+            padding: 3px; /* Space for gradient border */
+        }
+        .poster-container h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d9488;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+        .poster-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        .poster-container p {
+            font-size: 1rem;
+            color: #4b5563;
+            margin: 0.5rem 0;
+        }
+        .poster-container .institute-info {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-style: italic;
+            margin: 0.5rem 0;
         }
     </style>
 </head>
@@ -110,144 +163,190 @@
                     <p class="text-sm text-gray-600 text-center">Palazhi, Calicut</p>
                 </div>
                 <div id="successMessage" class="text-center text-teal-900 text-lg font-semibold mb-6">Passed Successfully</div>
+                
                 <div id="resultsTable" class="w-full text-left text-sm text-gray-800 mb-6"></div>
             </div>
             <div class="flex space-x-4">
-                <button onclick="downloadPDF()" class="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition duration-200 hover-scale">Download Results</button>
+                <button onclick="downloadPoster()" class="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition duration-200 hover-scale">Download Poster</button>
                 <button onclick="logout()" class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 transition duration-200 hover-scale">Back to Login</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const users = {
-            'rayan': { password: '2014-09-22', marks: { Hifz: 40, Thajveed: 9, Qirat: 4 } },
-            'muhammedfiroz': { password: '2014-01-02', marks: { Hifz: 40, Thajveed: 8.5, Qirat: 4 } },
-            'muhammedhadhi': { password: '2014-07-21', marks: { Hifz: 43, Thajveed: 7, Qirat: 6 } },
-            'muhammedsabith': { password: '2015-03-18', marks: { Hifz: 30, Thajveed: 10, Qirat: 6 } },
-            'muhammedrabeehpt': { password: '2014-12-22', marks: { Hifz: 34, Thajveed: 8, Qirat: 4 } },
-            'abdulrehan': { password: '2013-06-04', marks: { Hifz: 31, Thajveed: 8, Qirat: 4 } },
-            'muhammedmidlaj': { password: '2015-03-18', marks: { Hifz: 27, Thajveed: 5, Qirat: 2 } },
-            'ahmedjavad': { password: '2015-12-28', marks: { Hifz: 45, Thajveed: 14, Qirat: 8 } },
-            'muhammedfiras': { password: '2012-07-05', marks: { Hifz: 30, Thajveed: 8, Qirat: 4 } },
-            'muhammedaboobacker': { password: '2012-06-24', marks: { Hifz: 25, Thajveed: 7, Qirat: 3 } },
-            'muhammedrabeehap': { password: '2011-12-22', marks: { Hifz: 30, Thajveed: 12, Qirat: 6.5 } },
-            'muhammedshibily': { password: '2012-10-01', marks: { Hifz: 35, Thajveed: 14, Qirat: 8 } },
-            'muhammednaheem': { password: '2012-11-17', marks: { Hifz: 28, Thajveed: 9, Qirat: 5 } },
-            'shadiameen': { password: '2011-12-10', marks: { Hifz: 32, Thajveed: 12, Qirat: 6 } },
-            'muhammedshahal': { password: '2011-03-26', marks: { Hifz: 23, Thajveed: 9, Qirat: 4 } },
-            'muhammedmusthafa': { password: '2012-11-12', marks: { Hifz: 20, Thajveed: 7, Qirat: 3 } }
-        };
+   <script>
+    const users = {
+        'rayan': { password: '2014-09-22', marks: { Hifz: 40, Thajveed: 9, Qirat: 4 } },
+        'muhammedfiroz': { password: '2014-01-02', marks: { Hifz: 40, Thajveed: 8.5, Qirat: 4 } },
+        'muhammedhadhi': { password: '2014-07-21', marks: { Hifz: 43, Thajveed: 7, Qirat: 6 } },
+        'muhammedsabith': { password: '2015-03-18', marks: { Hifz: 30, Thajveed: 10, Qirat: 6 } },
+        'muhammedrabeehpt': { password: '2014-12-22', marks: { Hifz: 34, Thajveed: 8, Qirat: 4 } },
+        'abdulrehan': { password: '2013-06-04', marks: { Hifz: 31, Thajveed: 8, Qirat: 4 } },
+        'muhammedmidlaj': { password: '2015-03-18', marks: { Hifz: 27, Thajveed: 5, Qirat: 2 } },
+        'ahmedjavad': { password: '2015-12-28', marks: { Hifz: 45, Thajveed: 14, Qirat: 8 } },
+        'muhammedfiras': { password: '2012-07-05', marks: { Hifz: 30, Thajveed: 8, Qirat: 4 } },
+        'muhammedaboobacker': { password: '2012-06-24', marks: { Hifz: 25, Thajveed: 7, Qirat: 3 } },
+        'muhammedrabeehap': { password: '2011-12-22', marks: { Hifz: 30, Thajveed: 12, Qirat: 6.5 } },
+        'muhammedshibily': { password: '2012-10-01', marks: { Hifz: 35, Thajveed: 14, Qirat: 8 } },
+        'muhammednaheem': { password: '2012-11-17', marks: { Hifz: 28, Thajveed: 9, Qirat: 5 } },
+        'shadiameen': { password: '2011-12-10', marks: { Hifz: 32, Thajveed: 12, Qirat: 6 } },
+        'muhammedshahal': { password: '2011-03-26', marks: { Hifz: 23, Thajveed: 9, Qirat: 4 } },
+        'muhammedmusthafa': { password: '2012-11-12', marks: { Hifz: 20, Thajveed: 7, Qirat: 3 } }
+    };
 
-        function login() {
-            const usernameInput = document.getElementById('username');
-            const password = document.getElementById('password').value;
-            const messageDiv = document.getElementById('message');
-            const loginFront = document.getElementById('loginFront');
-            const successBack = document.getElementById('successBack');
-            const resultsTable = document.getElementById('resultsTable');
+    // Map usernames to specific photos based on order
+    const studentPhotos = [
+        's1.jpg', 's2.jpg', 's3.jpg', 's4.jpg', 's5.jpg', 's6.jpg', 's7.jpg', 's8.jpg',
+        's9.jpg', 's10.jpg', 's11.jpg', 's12.jpg', 's13.jpg', 's14.jpg', 's15.jpg', 's16.jpg'
+    ];
+    const usernameToPhoto = {};
+    Object.keys(users).forEach((username, index) => {
+        usernameToPhoto[username] = studentPhotos[index];
+    });
 
-            // Clear previous message
-            messageDiv.textContent = '';
-            messageDiv.className = 'text-center text-sm font-medium';
+    let currentUser = null; // Store the logged-in username
 
-            // Check if username input exists and has a value
-            if (!usernameInput || !usernameInput.value || !password) {
-                messageDiv.className += ' text-red-600';
-                messageDiv.textContent = 'Please fill in both username and password';
-                return;
-            }
+    function login() {
+        const usernameInput = document.getElementById('username');
+        const password = document.getElementById('password').value;
+        const messageDiv = document.getElementById('message');
+        const loginFront = document.getElementById('loginFront');
+        const successBack = document.getElementById('successBack');
+        const resultsTable = document.getElementById('resultsTable');
 
-            const username = usernameInput.value.trim().toLowerCase();
+        // Clear previous message
+        messageDiv.textContent = '';
+        messageDiv.className = 'text-center text-sm font-medium';
 
-            if (users[username] && users[username].password === password) {
-                // Switch to success view
-                loginFront.classList.add('hidden');
-                successBack.classList.remove('hidden');
-                
-                // Calculate total marks and percentage
-                const marks = users[username].marks;
-                const totalMarks = marks.Hifz + marks.Thajveed + marks.Qirat;
-                const percentage = ((totalMarks / 80) * 100).toFixed(2);
-
-                // Display results table
-                resultsTable.innerHTML = `
-                    <table class="w-full border-collapse">
-                        <thead>
-                            <tr class="bg-teal-50">
-                                <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Subject</th>
-                                <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Marks</th>
-                                <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Out of</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border border-gray-200 px-4 py-2">Hifz</td>
-                                <td class="border border-gray-200 px-4 py-2">${marks.Hifz}</td>
-                                <td class="border border-gray-200 px-4 py-2">50</td>
-                            </tr>
-                            <tr>
-                                <td class="border border-gray-200 px-4 py-2">Thajveed</td>
-                                <td class="border border-gray-200 px-4 py-2">${marks.Thajveed}</td>
-                                <td class="border border-gray-200 px-4 py-2">20</td>
-                            </tr>
-                            <tr>
-                                <td class="border border-gray-200 px-4 py-2">Qira't</td>
-                                <td class="border border-gray-200 px-4 py-2">${marks.Qirat}</td>
-                                <td class="border border-gray-200 px-4 py-2">10</td>
-                            </tr>
-                            <tr class="font-medium">
-                                <td class="border border-gray-200 px-4 py-2">Total Marks</td>
-                                <td class="border border-gray-200 px-4 py-2">${totalMarks}</td>
-                                <td class="border border-gray-200 px-4 py-2">80</td>
-                            </tr>
-                            <tr class="font-medium">
-                                <td class="border border-gray-200 px-4 py-2">Percentage</td>
-                                <td class="border border-gray-200 px-4 py-2">${percentage}%</td>
-                                <td class="border border-gray-200 px-4 py-2">100</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `;
-                // Clear input fields
-                usernameInput.value = '';
-                document.getElementById('password').value = '';
-            } else {
-                messageDiv.className += ' text-red-600';
-                messageDiv.textContent = 'Invalid username or password';
-            }
+        // Check if username input exists and has a value
+        if (!usernameInput || !usernameInput.value || !password) {
+            messageDiv.className += ' text-red-600';
+            messageDiv.textContent = 'Please fill in both username and password';
+            return;
         }
 
-        function downloadPDF() {
-            const element = document.getElementById('resultContent');
-            const opt = {
-                margin: 0.5,
-                filename: 'results.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
+        const username = usernameInput.value.trim().toLowerCase();
+
+        if (users[username] && users[username].password === password) {
+            currentUser = username; // Store the logged-in username
+            // Switch to success view
+            loginFront.classList.add('hidden');
+            successBack.classList.remove('hidden');
+
+            // Calculate total marks and percentage
+            const marks = users[username].marks;
+            const totalMarks = marks.Hifz + marks.Thajveed + marks.Qirat;
+            const percentage = ((totalMarks / 80) * 100).toFixed(2);
+
+            // Display results table
+            resultsTable.innerHTML = `
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-teal-50">
+                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Subject</th>
+                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Marks</th>
+                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Out of</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2">Hifz</td>
+                            <td class="border border-gray-200 px-4 py-2">${marks.Hifz}</td>
+                            <td class="border border-gray-200 px-4 py-2">50</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2">Thajveed</td>
+                            <td class="border border-gray-200 px-4 py-2">${marks.Thajveed}</td>
+                            <td class="border border-gray-200 px-4 py-2">20</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-gray-200 px-4 py-2">Qira't</td>
+                            <td class="border border-gray-200 px-4 py-2">${marks.Qirat}</td>
+                            <td class="border border-gray-200 px-4 py-2">10</td>
+                        </tr>
+                        <tr class="font-medium">
+                            <td class="border border-gray-200 px-4 py-2">Total Marks</td>
+                            <td class="border border-gray-200 px-4 py-2">${totalMarks}</td>
+                            <td class="border border-gray-200 px-4 py-2">80</td>
+                        </tr>
+                        <tr class="font-medium">
+                            <td class="border border-gray-200 px-4 py-2">Percentage</td>
+                            <td class="border border-gray-200 px-4 py-2">${percentage}%</td>
+                            <td class="border border-gray-200 px-4 py-2">100</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+            // Clear input fields
+            usernameInput.value = '';
+            document.getElementById('password').value = '';
+        } else {
+            messageDiv.className += ' text-red-600';
+            messageDiv.textContent = 'Invalid username or password';
+        }
+    }
+
+    function downloadPoster() {
+        if (!currentUser) {
+            alert('Please log in first to download the poster.');
+            return;
         }
 
-        function logout() {
-            const loginFront = document.getElementById('loginFront');
-            const successBack = document.getElementById('successBack');
-            loginFront.className = '';
-            successBack.classList.add('hidden');
-        }
+        const studentName = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
+        const studentPhoto = usernameToPhoto[currentUser] || 's1.jpg'; // Fallback to s1.jpg if username not found
 
-        // Handle Enter key press for login
-        document.getElementById('username').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                login();
-            }
+        // Create poster content
+        const posterDiv = document.createElement('div');
+        posterDiv.className = 'poster-container';
+        posterDiv.innerHTML = `
+            <img src="./bgg.jpeg" alt="Madrasa Logo" class="logo">
+            <h2>Congratulations, ${studentName}!</h2>
+            <p>You have successfully passed!</p>
+            <p class="institute-info">PM Ali Haji Memorial Hifuz Quran College, Palazhi, Calicut</p>
+            <img src="${studentPhoto}" alt="Student Photo" class="student-photo">
+        `;
+
+        // Append poster to body temporarily for rendering
+        document.body.appendChild(posterDiv);
+
+        // Use html2canvas to capture the poster as an image
+        html2canvas(posterDiv, {
+            scale: 1.5, // Reduced scale for smaller file size
+            useCORS: true, // Enable CORS for images
+            logging: false
+        }).then(canvas => {
+            // Create a download link for the image
+            const link = document.createElement('a');
+            link.download = `${studentName}_congratulations_poster.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            // Remove poster from DOM after download
+            document.body.removeChild(posterDiv);
+        }).catch(error => {
+            console.error('Error generating poster:', error);
+            document.body.removeChild(posterDiv);
         });
-        document.getElementById('password').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                login();
-            }
-        });
-    </script>
+    }
+
+    function logout() {
+        const loginFront = document.getElementById('loginFront');
+        const successBack = document.getElementById('successBack');
+        loginFront.className = '';
+        successBack.classList.add('hidden');
+        currentUser = null; // Clear the current user on logout
+    }
+
+    // Handle Enter key press for login
+    document.getElementById('username').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            login();
+        }
+    });
+    document.getElementById('password').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            login();
+        }
+    });
+</script>
 </body>
 </html>
