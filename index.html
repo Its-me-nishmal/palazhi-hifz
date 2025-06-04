@@ -79,7 +79,7 @@
             background: #64748b;
             border-radius: 3px;
         }
-        .poster-container {
+        .poster-container {.poster-container {
             width: 420px;
             height: 420px;
             margin: 2rem auto;
@@ -187,6 +187,7 @@
                 line-height: 1.2;
             }
         }
+    }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6">
@@ -357,57 +358,24 @@
                 </div>
             `;
 
-            // Render off-screen to avoid flicker
-            posterDiv.style.position = 'fixed';
-            posterDiv.style.left = '-9999px';
             document.body.appendChild(posterDiv);
 
-            // Wait for images to load
-            const images = posterDiv.querySelectorAll('img');
-            let loadedImages = 0;
-            const totalImages = images.length;
-
-            const renderCanvas = () => {
-                // Force reflow
-                posterDiv.offsetHeight;
-
-                html2canvas(posterDiv, {
-                    scale: 1.5,
-                    useCORS: true,
-                    logging: false,
-                    width: 420,
-                    height: 420
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = `${studentName}_congratulations_poster.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    document.body.removeChild(posterDiv);
-                }).catch(error => {
-                    console.error('Error generating poster:', error);
-                    document.body.removeChild(posterDiv);
-                });
-            };
-
-            if (totalImages === 0) {
-                renderCanvas();
-            } else {
-                images.forEach(img => {
-                    img.onload = () => {
-                        loadedImages++;
-                        if (loadedImages === totalImages) {
-                            renderCanvas();
-                        }
-                    };
-                    img.onerror = () => {
-                        console.error(`Failed to load image: ${img.src}`);
-                        loadedImages++;
-                        if (loadedImages === totalImages) {
-                            renderCanvas();
-                        }
-                    };
-                });
-            }
+            html2canvas(posterDiv, {
+                scale: 1.5,
+                useCORS: true,
+                logging: false,
+                width: 420,
+                height: posterDiv.offsetHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${studentName}_congratulations_poster.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.body.removeChild(posterDiv);
+            }).catch(error => {
+                console.error('Error generating poster:', error);
+                document.body.removeChild(posterDiv);
+            });
         }
 
         function logout() {
