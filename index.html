@@ -80,9 +80,10 @@
             border-radius: 3px;
         }
         .poster-container {
-            max-width: 420px;
+            width: 420px;
+            height: 420px;
             margin: 2rem auto;
-            padding: 2rem;
+            padding: 1.5rem;
             background: #f9fafb;
             border-radius: 1rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -91,37 +92,32 @@
             border: 1px solid #e5e7eb;
             background-image: linear-gradient(135deg, #ffffff 25%, #f3f4f6 25%, #f3f4f6 50%, #ffffff 50%, #ffffff 75%, #f3f4f6 75%);
             background-size: 22px 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
         }
         .poster-container .logo {
-            height: 50px;
-            margin-bottom: 1rem;
-        }
-        .title {
-            font-size: 1.4rem;
-            color: #1e293b;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #2dd4bf;
-            display: inline-block;
-            padding-bottom: 0.3rem;
+            height: 40px;
+            margin-bottom: 0.5rem;
         }
         .congrats {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #0f766e;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
         .subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #475569;
-            margin-bottom: 1.2rem;
+            margin-bottom: 0.8rem;
         }
         .photo-frame {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 1rem 0;
-            padding: 5px;
+            margin: 0.8rem 0;
+            padding: 4px;
             border-radius: 0.75rem;
             background: linear-gradient(to right, #0ea5e9, #2dd4bf);
             width: fit-content;
@@ -129,8 +125,8 @@
             margin-right: auto;
         }
         .student-photo {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
             object-fit: cover;
             border-radius: 0.5rem;
             border: 3px solid #ffffff;
@@ -138,40 +134,48 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .institute-info {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748b;
             font-style: italic;
-            margin-top: 1rem;
-            line-height: 1.3;
+            margin-top: 0.8rem;
+            line-height: 1.2;
         }
         /* Ensure poster styles are consistent on mobile */
         @media (max-width: 640px) {
             .poster-container {
-                max-width: 600px;
                 width: 420px;
+                height: 420px;
                 margin: 1rem auto;
                 padding: 1.5rem;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
                 border: 1px solid #e5e7eb;
                 background-image: linear-gradient(135deg, #ffffff 25%, #f3f4f6 25%, #f3f4f6 50%, #ffffff 50%, #ffffff 75%, #f3f4f6 75%);
                 background-size: 22px 22px;
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
             }
             .poster-container .logo {
-                height: 50px;
-                margin-bottom: 1rem;
+                height: 40px;
+                margin-bottom: 0.5rem;
             }
             .congrats {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
             .subtitle {
-                font-size: 0.95rem;
+                font-size: 0.9rem;
             }
             .student-photo {
-                width: 100px;
-                height: 100px;
+                width: 90px;
+                height: 90px;
             }
             .institute-info {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -344,14 +348,20 @@
                 </div>
             `;
 
+            // Ensure poster renders off-screen to avoid visual flicker
+            posterDiv.style.position = 'fixed';
+            posterDiv.style.left = '-9999px';
             document.body.appendChild(posterDiv);
+
+            // Force a reflow to ensure content is rendered before capture
+            posterDiv.offsetHeight;
 
             html2canvas(posterDiv, {
                 scale: 1.5,
                 useCORS: true,
                 logging: false,
                 width: 420,
-                height: posterDiv.offsetHeight
+                height: 420 // Explicitly set to ensure square output
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `${studentName}_congratulations_poster.png`;
