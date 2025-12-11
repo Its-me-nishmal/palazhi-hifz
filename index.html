@@ -1,383 +1,744 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madrasa Result Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        /* Custom animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-        .slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        .hover-scale {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .hover-scale:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-        }
-        /* Subtle colored border corners */
-        .border-corners {
-            position: relative;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-        }
-        .border-corners::before,
-        .border-corners::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-        }
-        .border-corners::before {
-            top: -1px;
-            left: -1px;
-            border-top: 2px solid #0d9488;
-            border-left: 2px solid #0d9488;
-            border-top-left-radius: 0.75rem;
-        }
-        .border-corners::after {
-            bottom: -1px;
-            right: -1px;
-            border-bottom: 2px solid #0d9488;
-            border-right: 2px solid #0d9488;
-            border-bottom-right-radius: 0.75rem;
-        }
-        /* Typography and layout */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100vh;
-            margin: 0;
-        }
-        /* Logo styling */
-        .logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #64748b;
-            border-radius: 3px;
-        }
-        /* Poster styles */
-      .poster-container {
-    max-width: 420px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #f9fafb;
-    border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    text-align: center;
-    border: 1px solid #e5e7eb;
-    background-image: linear-gradient(135deg, #ffffff 25%, #f3f4f6 25%, #f3f4f6 50%, #ffffff 50%, #ffffff 75%, #f3f4f6 75%);
-    background-size: 22px 22px;
-}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hifz Student Portal — PM Ali Haji Memorial College</title>
 
-.logo {
-    height: 50px;
-    margin-bottom: 1rem;
-}
+  <!-- html2canvas for certificate download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-.title {
-    font-size: 1.4rem;
-    color: #1e293b;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #2dd4bf;
-    display: inline-block;
-    padding-bottom: 0.3rem;
-}
+  <style>
+    /* ---------- RESET ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height:100%; }
+    body {
+      font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, #071b13 0%, #0b3d2b 60%);
+      color: #0f2b21;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.35;
+      padding: 18px; /* Slightly reduced padding for smaller screens by default */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.congrats {
-    font-size: 1.2rem;
-    color: #0f766e;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
+    /* ---------- LAYOUT ---------- */
+    .app {
+      width: 100%;
+      max-width: 1100px; /* Base max-width */
+      margin: 0 auto;
+    }
 
-.subtitle {
-    font-size: 0.95rem;
-    color: #475569;
-    margin-bottom: 1.2rem;
-}
+    /* Add a fluid max-width to the app for better responsiveness */
+    @media (max-width: 1120px) { /* Adjust app max-width slightly below its max-width */
+      .app {
+        max-width: 90%; /* Make it fluid up to 1100px */
+      }
+    }
 
-.photo-frame {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem 0;
-    padding: 5px;
-    border-radius: 0.75rem;
-    background: linear-gradient(to right, #0ea5e9, #2dd4bf);
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-}
+    .card {
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(2,12,8,0.35);
+      padding: 28px;
+      overflow: hidden;
+    }
 
-.student-photo {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-    border: 3px solid #ffffff;
-    background-color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
+    /* ---------- HEADER ---------- */
+    .brand {
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom: 18px;
+    }
 
-.institute-info {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-style: italic;
-    margin-top: 1rem;
-    line-height: 1.3;
-}
+    .logo {
+      width:72px;
+      height:72px;
+      flex: 0 0 72px;
+      background: linear-gradient(135deg,#0b4f3a,#0f6b52);
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: #fff;
+      font-weight:700;
+      box-shadow: 0 6px 18px rgba(11,79,58,0.25);
+      font-size: 28px;
+    }
 
-    </style>
+    .brand-text h1 {
+      font-size: 20px;
+      color: #07221a;
+      letter-spacing: 0.2px;
+    }
+    .brand-text p {
+      margin-top:6px;
+      font-size: 13px;
+      color: #3d6b58;
+    }
+
+    /* ---------- GRID: left = info + top3 | right = login ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 28px;
+      align-items:start;
+    }
+
+    /* ---------- LEFT: Home / Intro / Top3 ---------- */
+    .home-left {
+      padding: 8px 6px;
+    }
+
+    .intro {
+      background: linear-gradient(180deg, rgba(11,79,58,0.06), rgba(11,79,58,0.03));
+      border: 1px solid rgba(11,79,58,0.06);
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
+
+    .intro h2 {
+      color: #07221a;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .intro p { color:#3b6a55; font-size:14px; }
+
+    .home-stats {
+      margin-top: 14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .stat {
+      padding:10px 14px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(7,34,25,0.04);
+      border: 1px solid rgba(7,34,25,0.04);
+      min-width: 150px;
+    }
+    .stat .k { font-size: 18px; color:#0b4f3a; font-weight:700; }
+    .stat .label { font-size:12px; color:#3b6a55; margin-top:6px; }
+
+    /* Top performers */
+    .top-performers {
+      margin-top: 20px;
+      background: linear-gradient(180deg, rgba(11,79,58,0.04), rgba(11,79,58,0.02));
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(11,79,58,0.06);
+    }
+    .tp-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .tp-header h3 { color:#0b4f3a; font-size:15px; }
+    .tp-cards { display:flex; gap:12px; flex-wrap:wrap; }
+
+    .top-student-card {
+      background:#fff;
+      border-radius: 12px;
+      padding: 10px;
+      width: calc(33.333% - 8px);
+      min-width: 140px;
+      text-align:center;
+      box-shadow: 0 10px 22px rgba(2,12,8,0.05);
+      border: 1px solid rgba(7,34,25,0.03);
+      position:relative;
+    }
+    .top-student-card img {
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      object-fit:cover;
+      border:4px solid #eaf6ef;
+      margin-bottom: 8px;
+      display:block;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .top-student-card h4 { font-size:14px; color:#07221a; margin-bottom:6px; }
+    .top-student-card .score { font-weight:800; color:#0f6b52; font-size:16px; }
+    .rank-badge {
+      position:absolute;
+      top:-10px;
+      left:-10px;
+      background:#d4af37;
+      color:#07221a;
+      width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:10px; font-weight:700;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    /* ---------- RIGHT: LOGIN CARD ---------- */
+    .login-box {
+      padding:22px;
+      border-radius:12px;
+      background: linear-gradient(180deg,#fbfffb,#f8fffa);
+      border: 1px solid rgba(11,79,58,0.05);
+      box-shadow: 0 20px 40px rgba(2,12,8,0.05);
+    }
+
+    .login-title {
+      text-align:center;
+      margin-bottom:14px;
+    }
+    .login-title h3 { color:#0b4f3a; font-size:18px; }
+    .login-title p { font-size:13px; color:#496e5b; }
+
+    .form-row { margin-top:12px; }
+    label { display:block; font-size:13px; color:#2e5a4a; margin-bottom:6px; font-weight:600; }
+    select,input[type="date"]{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(7,34,25,0.06);
+      background:#fff;
+      font-size:14px;
+    }
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      margin-top:12px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,#0b4f3a,#0f6b52);
+      color:#fff;
+      box-shadow: 0 10px 20px rgba(11,79,58,0.18);
+      width:100%;
+    }
+    .btn-outline {
+      background:transparent;
+      color:#0b4f3a;
+      border:1px solid rgba(11,79,58,0.12);
+      width:100%;
+    }
+    .error { color:#c02b1d; font-weight:600; margin-top:8px; font-size:13px; }
+
+    /* ---------- DASHBOARD / RESULT (after login) ---------- */
+    .result-wrap {
+      display:none;
+      margin-top:18px;
+    }
+
+    .result-card {
+      padding:22px;
+      border-radius:14px;
+      background: linear-gradient(180deg,#ffffff,#fcfffb);
+      border: 1px solid rgba(7,34,25,0.04);
+      box-shadow: 0 20px 40px rgba(2,12,8,0.06);
+    }
+
+    .result-header {
+      text-align:center;
+      margin-bottom:16px;
+    }
+    .result-header .logo-small {
+      width:58px; height:58px; margin:0 auto 8px;
+      background:linear-gradient(135deg,#0b4f3a,#0f6b52);
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      border-radius:10px; font-weight:700; font-size:22px;
+    }
+    .result-header h2 { color:#07221a; font-size:20px; margin-bottom:4px; }
+    .result-header p { color:#3b6a55; }
+
+    .marks-table {
+      width:100%;
+      border-collapse:collapse;
+      margin: 18px 0;
+    }
+    .marks-table th, .marks-table td {
+      padding:12px 10px;
+      text-align:left;
+      border-bottom:1px solid rgba(7,34,25,0.04);
+      font-size:14px;
+      color:#184b3b;
+    }
+    .marks-table th { color:#0b4f3a; font-weight:700; background: rgba(11,79,58,0.02); }
+
+    .result-footer {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:16px;
+      flex-wrap:wrap;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg,#d4af37,#b68f26);
+      color:#07221a;
+      border:none;
+      padding:12px 18px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .back-btn { background:transparent; color:#0b4f3a; border:1px solid rgba(11,79,58,0.08); padding:12px 18px; border-radius:12px; cursor:pointer; font-weight:700; }
+
+    .grade-badge {
+      display:inline-block;
+      padding:10px 18px;
+      border-radius:40px;
+      font-weight:800;
+      color:#fff;
+      margin-top:8px;
+    }
+
+    /* certificate hidden canvas container styling */
+    .certificate-hidden {
+      display:none;
+      width:1200px;
+      height:850px;
+      padding:60px;
+      background:#fff;
+      border: 12px solid #0b4f3a;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .login-box { order: 2; margin-top: 18px; }
+      .home-left { order: 1; }
+      .top-student-card { width: calc(50% - 8px); min-width: 140px; } /* Two cards per row */
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 18px; } /* Adjust body padding */
+      .card { padding: 18px; } /* Adjust card padding */
+      .brand { gap: 12px; margin-bottom: 12px; }
+      .logo { width: 48px; height: 48px; font-size: 20px; }
+      .brand-text h1 { font-size: 18px; }
+      .brand-text p { font-size: 12px; }
+      .intro h2 { font-size: 16px; }
+      .intro p { font-size: 13px; }
+      .stat { min-width: unset; width: calc(50% - 6px); } /* Two stats per row */
+      .top-student-card { width: 100%; min-width: unset; } /* One card per row */
+      .result-footer { flex-direction: column; gap: 10px; } /* Stack buttons */
+      .download-btn, .back-btn { width: 100%; } /* Full width buttons */
+      .result-card { padding: 18px; } /* Adjust result card padding */
+      .result-header h2 { font-size: 18px; }
+      .result-header p { font-size: 13px; }
+      .marks-table th, .marks-table td { padding: 10px 8px; font-size: 13px; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .card { padding: 12px; }
+      .brand { gap: 10px; margin-bottom: 10px; }
+      .logo { width: 40px; height: 40px; font-size: 18px; }
+      .brand-text h1 { font-size: 16px; }
+      .brand-text p { font-size: 11px; }
+      .intro { padding: 12px; margin-bottom: 12px; }
+      .intro h2 { font-size: 15px; }
+      .intro p { font-size: 12px; }
+      .home-stats { gap: 8px; }
+      .stat { width: 100%; } /* One stat per row */
+      .top-performers { padding: 12px; }
+      .tp-header h3 { font-size: 14px; }
+      .tp-header small { font-size: 11px; }
+      .login-box { padding: 18px; }
+      .login-title h3 { font-size: 16px; }
+      .login-title p { font-size: 12px; }
+      label { font-size: 12px; margin-bottom: 4px; }
+      select, input[type="date"] { padding: 10px 12px; font-size: 13px; }
+      .btn { padding: 10px 14px; font-size: 13px; }
+      .error { font-size: 12px; }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6">
-    <div id="loginCard" class="w-full max-w-md bg-white border-corners shadow-md p-8 sm:p-10 fade-in">
-        <div id="loginFront" class="">
-            <div class="flex flex-col items-center mb-6">
-                <img src="./bgg.jpeg" alt="Madrasa Logo" class="logo mb-3">
-                <h2 class="text-xl font-semibold text-center text-gray-900 tracking-tight">PM Ali Haji Memorial Hifuz Quran College</h2>
-                <p class="text-sm text-gray-600 text-center">Palazhi, Calicut</p>
-            </div>
-            <div class="space-y-5">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 transition duration-200 bg-white text-gray-900" required>
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">Password (Date of Birth: YYYY-MM-DD)</label>
-                    <input type="date" id="password" placeholder="Enter your date of birth (YYYY-MM-DD)" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 transition duration-200 bg-white text-gray-900" required>
-                </div>
-                <button onclick="login()" class="w-full bg-teal-600 text-white py-2.5 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition duration-200 hover-scale">Sign In</button>
-                <div id="message" class="text-center text-sm font-medium"></div>
-            </div>
+<body>
+  <div class="app">
+    <div class="card" role="main" aria-labelledby="main-heading">
+      <div class="brand" style="margin-bottom:10px;">
+        <div class="logo" aria-hidden="true">م</div>
+        <div class="brand-text">
+          <h1 id="main-heading">PM Ali Haji Memorial Hifz Quran College</h1>
+          <p>Hifz Half Year Examination · 2025-26 · Palazhi, Calicut</p>
         </div>
-        <div id="successBack" class="hidden flex flex-col items-center justify-center p-8 slide-in">
-            <div id="resultContent">
-                <div class="flex flex-col items-center mb-6">
-                    <img src="./bgg.jpeg" alt="Madrasa Logo" class="logo mb-3">
-                    <h2 class="text-xl font-semibold text-center text-gray-900 tracking-tight">PM Ali Haji Memorial Hifuz Quran College</h2>
-                    <p class="text-sm text-gray-600 text-center">Palazhi, Calicut</p>
-                </div>
-                <div id="successMessage" class="text-center text-teal-900 text-lg font-semibold mb-6">Passed Successfully</div>
-                
-                <div id="resultsTable" class="w-full text-left text-sm text-gray-800 mb-6"></div>
+      </div>
+
+      <div class="grid" aria-live="polite">
+        <!-- LEFT: Home info + Top 3 performers -->
+        <div class="home-left" id="homeArea">
+          <div class="intro" aria-hidden="false">
+            <h2>Welcome to the Student Portal</h2>
+            <p>Quick access to results, certificates and top performers. Choose your name and enter your date of birth to view your result card and download a certificate/poster.</p>
+
+            <div class="home-stats" aria-hidden="true">
+              <div class="stat">
+                <div class="k" id="total-students">15</div>
+                <div class="label">Registered Students</div>
+              </div>
+              <div class="stat">
+                <div class="k" id="exams-held">1</div>
+                <div class="label">Examination Cycle</div>
+              </div>
+              <div class="stat">
+                <div class="k" id="top-score">51.5</div>
+                <div class="label">Top Score (Total)</div>
+              </div>
             </div>
-            <div class="flex space-x-4">
-                <button onclick="downloadPoster()" class="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition duration-200 hover-scale">Download Poster</button>
-                <button onclick="logout()" class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 transition duration-200 hover-scale">Back to Login</button>
+          </div>
+
+          <div class="top-performers" id="loginTopPerformers" aria-label="Top performers on home">
+            <div class="tp-header">
+              <h3>🏆 Top 3 Performers (Auto-ranked)</h3>
+              <small style="color:#3b6a55;">Based on total marks</small>
             </div>
+            <div class="tp-cards" id="loginTopStudents" role="list"></div>
+          </div>
+
         </div>
+
+        <!-- RIGHT: Login box -->
+        <aside class="login-box" aria-label="Student login box">
+          <div class="login-title">
+            <h3>Student Login</h3>
+            <p>Please select your name and enter date of birth (DD/MM/YYYY)</p>
+          </div>
+
+          <form id="loginForm" novalidate>
+            <div class="form-row">
+              <label for="studentName">Student Name</label>
+              <select id="studentName" required aria-required="true">
+                <option value="">Select your name</option>
+                <option value="M. Firas">M. Firas</option>
+                <option value="M. Rabeeh AP">M. Rabeeh AP</option>
+                <option value="M. Shibly">M. Shibly</option>
+                <option value="Sayyid Naheem">Sayyid Naheem</option>
+                <option value="M. Sahal">M. Sahal</option>
+                <option value="M. Musthafa">M. Musthafa</option>
+                <option value="Abdul Rehan">Abdul Rehan</option>
+                <option value="M. Firos">M. Firos</option>
+                <option value="M. Hadi">M. Hadi</option>
+                <option value="M. Sabith">M. Sabith</option>
+                <option value="M. Midlaj">M. Midlaj</option>
+                <option value="Rayan">Rayan</option>
+                <option value="M. Rabeeh PT">M. Rabeeh PT</option>
+                <option value="M. Sahad">M. Sahad</option>
+                <option value="M. Shifin">M. Shifin</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="dob">Date of Birth</label>
+              <input id="dob" type="date" required aria-required="true">
+            </div>
+
+            <div class="form-row">
+              <button class="btn btn-primary" id="loginBtn" type="submit">Login</button>
+            </div>
+
+            <p id="errorMsg" class="error" role="alert" aria-live="assertive"></p>
+          </form>
+
+          <!-- RESULT WRAP: shown AFTER login -->
+          <div class="result-wrap" id="resultWrap" aria-hidden="true">
+            <div class="result-card" id="resultCard">
+              <div class="result-header">
+                <div class="logo-small">م</div>
+                <h2 id="resName">Student Name</h2>
+                <p id="resSub">Palazhi, Calicut</p>
+              </div>
+
+              <table class="marks-table" aria-labelledby="resName">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th style="width:110px;">Marks</th>
+                    <th style="width:110px;">Out of</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Hifz</td><td id="rHifz">-</td><td>50</td></tr>
+                  <tr><td>Tajweed</td><td id="rTajweed">-</td><td>20</td></tr>
+                  <tr><td>Qira't</td><td id="rQirath">-</td><td>10</td></tr>
+                  <tr><td style="font-weight:800">Total Marks</td><td id="rTotal" style="font-weight:800"></td><td>80</td></tr>
+                  <tr><td style="font-weight:800">Percentage</td><td id="rPercent" style="font-weight:800"></td><td>100</td></tr>
+                </tbody>
+              </table>
+
+              <div style="text-align:center;">
+                <div id="statusText" style="font-weight:700; color:#0b4f3a;"></div>
+                <div id="gradeBadge" class="grade-badge" aria-hidden="false"></div>
+                <div id="gradeMessage" style="color:#496e5b; margin-top:8px; font-weight:600;"></div>
+              </div>
+
+              <div class="result-footer" style="margin-top:18px;">
+                <button class="download-btn" id="downloadPoster">📄 Download Poster</button>
+                <button class="back-btn" id="backToLogin">← Back to Login</button>
+              </div>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+
+      <!-- Hidden certificate poster to render by html2canvas -->
+      <div id="certificate" class="certificate-hidden" aria-hidden="true">
+        <div style="text-align:center;">
+          <div style="font-size:48px; color:#0b4f3a; font-weight:900;">PM Ali Haji Memorial</div>
+          <div style="font-size:20px; color:#0b4f3a; margin-top:8px;">Hifz Half Year Examination — 2025-26</div>
+        </div>
+
+        <div style="margin-top:40px; text-align:center;">
+          <div style="font-size:36px; color:#764b2a; font-weight:900;" id="certStudentName">STUDENT</div>
+          <div style="margin-top:14px; font-size:18px; color:#0b4f3a;">Passed Successfully</div>
+        </div>
+
+        <div style="display:flex; gap:36px; justify-content:center; margin-top:36px;">
+          <div style="text-align:center;">
+            <div style="font-size:20px; color:#3b6a55;">Hifz</div>
+            <div style="font-size:26px; font-weight:900; margin-top:6px;" id="certHifz">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:20px; color:#3b6a55;">Tajweed</div>
+            <div style="font-size:26px; font-weight:900; margin-top:6px;" id="certTajweed">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:20px; color:#3b6a55;">Qira't</div>
+            <div style="font-size:26px; font-weight:900; margin-top:6px;" id="certQirath">0</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:20px; color:#3b6a55;">Total</div>
+            <div style="font-size:26px; font-weight:900; margin-top:6px;" id="certTotal">0</div>
+          </div>
+        </div>
+
+        <div style="position:absolute; bottom:60px; left:60px; right:60px; display:flex; justify-content:space-between; color:#764b2a;">
+          <div style="text-align:center;">
+            <div style="border-top:2px solid #764b2a; width:220px; margin:auto;"></div>
+            <div style="margin-top:6px;">Principal</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="border-top:2px solid #764b2a; width:220px; margin:auto;"></div>
+            <div style="margin-top:6px;">Head of Department</div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-   <script>
-    const users = {
-        'rayan': { password: '2014-09-22', marks: { Hifz: 40, Thajveed: 9, Qirat: 4 } },
-        'muhammedfiroz': { password: '2014-01-02', marks: { Hifz: 40, Thajveed: 8.5, Qirat: 4 } },
-        'muhammedhadhi': { password: '2014-07-21', marks: { Hifz: 43, Thajveed: 7, Qirat: 6 } },
-        'muhammedsabith': { password: '2015-03-18', marks: { Hifz: 30, Thajveed: 10, Qirat: 6 } },
-        'muhammedrabeehpt': { password: '2014-12-22', marks: { Hifz: 34, Thajveed: 8, Qirat: 4 } },
-        'abdulrehan': { password: '2013-06-04', marks: { Hifz: 31, Thajveed: 8, Qirat: 4 } },
-        'muhammedmidlaj': { password: '2015-03-18', marks: { Hifz: 27, Thajveed: 5, Qirat: 2 } },
-        'ahmedjavad': { password: '2015-12-28', marks: { Hifz: 45, Thajveed: 14, Qirat: 8 } },
-        'muhammedfiras': { password: '2012-07-05', marks: { Hifz: 30, Thajveed: 8, Qirat: 4 } },
-        'muhammedaboobacker': { password: '2012-06-24', marks: { Hifz: 25, Thajveed: 7, Qirat: 3 } },
-        'muhammedrabeehap': { password: '2011-12-22', marks: { Hifz: 30, Thajveed: 12, Qirat: 6.5 } },
-        'muhammedshibily': { password: '2012-10-01', marks: { Hifz: 35, Thajveed: 14, Qirat: 8 } },
-        'muhammednaheem': { password: '2012-11-17', marks: { Hifz: 28, Thajveed: 9, Qirat: 5 } },
-        'shadiameen': { password: '2011-12-10', marks: { Hifz: 32, Thajveed: 12, Qirat: 6 } },
-        'muhammedshahal': { password: '2011-03-26', marks: { Hifz: 23, Thajveed: 9, Qirat: 4 } },
-        'muhammedmusthafa': { password: '2012-11-12', marks: { Hifz: 20, Thajveed: 7, Qirat: 3 } }
-    };
+<script>
+  // ---------- Student Data ----------
+  const students = {
+    "M. Firas":      { dob: "2010-05-15", juzuh: 12,  hifz: 38.5, tajweed: 9,   qirath: 4,   photo: "s1.jpg" },
+    "M. Rabeeh AP":  { dob: "2009-08-22", juzuh: 6,   hifz: 31,   tajweed: 8,   qirath: 4,   photo: "s2.jpg" },
+    "M. Shibly":     { dob: "2011-03-10", juzuh: 5,   hifz: 29,   tajweed: 15,  qirath: 7,   photo: "s3.jpg" },
+    "Sayyid Naheem": { dob: "2010-11-05", juzuh: 12,  hifz: 42,   tajweed: 9,   qirath: 5,   photo: "s4.jpg" },
+    "M. Sahal":      { dob: "2009-07-18", juzuh: 16,  hifz: 46,   tajweed: 10,  qirath: 4,   photo: "s5.jpg" },
+    "M. Musthafa":   { dob: "2010-01-25", juzuh: 17,  hifz: 36.5, tajweed: 8,   qirath: 4,   photo: "s6.jpg" },
+    "Abdul Rehan":   { dob: "2011-09-30", juzuh: 6.5, hifz: 12,   tajweed: 8,   qirath: 4,   photo: "s7.jpg" },
+    "M. Firos":      { dob: "2009-12-12", juzuh: 6,   hifz: 50.5, tajweed: 10,  qirath: 6,   photo: "s8.jpg" },
+    "M. Hadi":       { dob: "2010-04-08", juzuh: 5.6, hifz: 31,   tajweed: 7,   qirath: 4,   photo: "s9.jpg" },
+    "M. Sabith":     { dob: "2011-06-20", juzuh: 7.5, hifz: 31,   tajweed: 6,   qirath: 4,   photo: "s10.jpg" },
+    "M. Midlaj":     { dob: "2010-02-14", juzuh: 5.14,hifz: 34,   tajweed: 7,   qirath: 4,   photo: "s11.jpg" },
+    "Rayan":         { dob: "2009-10-03", juzuh: 6.5, hifz: 37,   tajweed: 8,   qirath: 5,   photo: "s12.jpg" },
+    "M. Rabeeh PT":  { dob: "2011-01-17", juzuh: 5.9, hifz: 32.5, tajweed: 7,   qirath: 4,   photo: "s13.jpg" },
+    "M. Sahad":      { dob: "2010-08-09", juzuh: 3.7, hifz: 51.5, tajweed: 8.5, qirath: 5.5, photo: "s14.jpg" },
+    "M. Shifin":     { dob: "2009-11-28", juzuh: 2.10,hifz: 50,   tajweed: 7,   qirath: 4,   photo: "s15.jpg" }
+  };
 
-    // Map usernames to specific photos based on order
-    const studentPhotos = [
-        's1.jpg', 's2.jpg', 's3.jpg', 's4.jpg', 's5.jpg', 's6.jpg', 's7.jpg', 's8.jpg',
-        's9.jpg', 's10.jpg', 's11.jpg', 's12.jpg', 's13.jpg', 's14.jpg', 's15.jpg', 's16.jpg'
-    ];
-    const usernameToPhoto = {};
-    Object.keys(users).forEach((username, index) => {
-        usernameToPhoto[username] = studentPhotos[index];
+  // constants
+  const TOTAL_OUT_OF = 80;
+
+  // ---------- UTILS ----------
+  function getTotal(student) {
+    // sum numeric marks
+    return Number(student.hifz) + Number(student.tajweed) + Number(student.qirath);
+  }
+
+  function getPercentage(total) {
+    return (total / TOTAL_OUT_OF) * 100;
+  }
+
+  function getGradeInfo(percent) {
+    // grading by percentage - tuned for this small dataset
+    if (percent >= 75) return { grade: 'A+', color: '#1b5e20', message: 'Outstanding Performance!' };
+    if (percent >= 65) return { grade: 'A', color: '#2e7d32', message: 'Excellent Performance!' };
+    if (percent >= 50) return { grade: 'B', color: '#388e3c', message: 'Very Good Performance!' };
+    if (percent >= 40) return { grade: 'C', color: '#f57c00', message: 'Good Performance' };
+    return { grade: 'D', color: '#c62828', message: 'Keep Working Hard' };
+  }
+
+  // ---------- RENDER TOP 3 ON HOME (AUTO RANK) ----------
+  function showLoginTopPerformers() {
+    const topStudentsDiv = document.getElementById('loginTopStudents');
+    const arr = Object.entries(students).map(([name, data]) => ({
+      name, ...data, total: getTotal(data)
+    }));
+
+    // sort descending by total and take top 3
+    const top = arr.sort((a,b) => b.total - a.total).slice(0,3);
+
+    // set some basic home stats
+    document.getElementById('total-students').textContent = arr.length;
+    const topScore = Math.max(...arr.map(s => s.total));
+    document.getElementById('top-score').textContent = topScore;
+
+    // render
+    topStudentsDiv.innerHTML = top.map((s, idx) => `
+      <div class="top-student-card" role="listitem">
+        <div class="rank-badge">${idx+1}</div>
+        <img src="${s.photo}" alt="Photo of ${s.name}" onerror="this.style.opacity=.6; this.alt='photo not found'">
+        <h4>${s.name}</h4>
+        <div class="score">${s.total}</div>
+        <div style="font-size:12px; color:#496e5b; margin-top:6px;">Grade ${getGradeInfo(getPercentage(s.total)).grade}</div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- INITIALIZE ----------
+  document.addEventListener('DOMContentLoaded', function() {
+    showLoginTopPerformers();
+    setupHandlers();
+  });
+
+  // ---------- LOGIN HANDLER ----------
+  let currentUser = null;
+
+  function setupHandlers() {
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const backBtn = document.getElementById('backToLogin');
+    const dlBtn = document.getElementById('downloadPoster');
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      doLogin();
     });
 
-    let currentUser = null; // Store the logged-in username
-
-    function login() {
-        const usernameInput = document.getElementById('username');
-        const password = document.getElementById('password').value;
-        const messageDiv = document.getElementById('message');
-        const loginFront = document.getElementById('loginFront');
-        const successBack = document.getElementById('successBack');
-        const resultsTable = document.getElementById('resultsTable');
-
-        // Clear previous message
-        messageDiv.textContent = '';
-        messageDiv.className = 'text-center text-sm font-medium';
-
-        // Check if username input exists and has a value
-        if (!usernameInput || !usernameInput.value || !password) {
-            messageDiv.className += ' text-red-600';
-            messageDiv.textContent = 'Please fill in both username and password';
-            return;
-        }
-
-        const username = usernameInput.value.trim().toLowerCase();
-
-        if (users[username] && users[username].password === password) {
-            currentUser = username; // Store the logged-in username
-            // Switch to success view
-            loginFront.classList.add('hidden');
-            successBack.classList.remove('hidden');
-
-            // Calculate total marks and percentage
-            const marks = users[username].marks;
-            const totalMarks = marks.Hifz + marks.Thajveed + marks.Qirat;
-            const percentage = ((totalMarks / 80) * 100).toFixed(2);
-
-            // Display results table
-            resultsTable.innerHTML = `
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-teal-50">
-                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Subject</th>
-                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Marks</th>
-                            <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Out of</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border border-gray-200 px-4 py-2">Hifz</td>
-                            <td class="border border-gray-200 px-4 py-2">${marks.Hifz}</td>
-                            <td class="border border-gray-200 px-4 py-2">50</td>
-                        </tr>
-                        <tr>
-                            <td class="border border-gray-200 px-4 py-2">Thajveed</td>
-                            <td class="border border-gray-200 px-4 py-2">${marks.Thajveed}</td>
-                            <td class="border border-gray-200 px-4 py-2">20</td>
-                        </tr>
-                        <tr>
-                            <td class="border border-gray-200 px-4 py-2">Qira't</td>
-                            <td class="border border-gray-200 px-4 py-2">${marks.Qirat}</td>
-                            <td class="border border-gray-200 px-4 py-2">10</td>
-                        </tr>
-                        <tr class="font-medium">
-                            <td class="border border-gray-200 px-4 py-2">Total Marks</td>
-                            <td class="border border-gray-200 px-4 py-2">${totalMarks}</td>
-                            <td class="border border-gray-200 px-4 py-2">80</td>
-                        </tr>
-                        <tr class="font-medium">
-                            <td class="border border-gray-200 px-4 py-2">Percentage</td>
-                            <td class="border border-gray-200 px-4 py-2">${percentage}%</td>
-                            <td class="border border-gray-200 px-4 py-2">100</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-            // Clear input fields
-            usernameInput.value = '';
-            document.getElementById('password').value = '';
-        } else {
-            messageDiv.className += ' text-red-600';
-            messageDiv.textContent = 'Invalid username or password';
-        }
-    }
-
-    function downloadPoster() {
-        if (!currentUser) {
-            alert('Please log in first to download the poster.');
-            return;
-        }
-
-        const studentName = currentUser.charAt(0).toUpperCase() + currentUser.slice(1);
-        const studentPhoto = usernameToPhoto[currentUser] || 's1.jpg'; // Fallback to s1.jpg if username not found
-
-        // Create poster content
-        const posterDiv = document.createElement('div');
-       posterDiv.className = 'poster-container';
-posterDiv.innerHTML = `
-    <div class="poster-header">
-        <img src="./bgg.jpeg" alt="Madrasa Logo" class="logo">
-    </div>
-    <div class="poster-body">
-        <h2 class="congrats">Congratulations, ${studentName}!</h2>
-        <p class="subtitle">You have successfully completed the Hifz annual Examination 2024-25.</p>
-        <div class="photo-frame">
-            <img src="${studentPhoto}" alt="Student Photo" class="student-photo">
-        </div>
-        <p class="institute-info">PM Ali Haji Memorial Hifz-ul-Quran College<br>Palazhi, Calicut</p>
-    </div>
-`;
-
-
-        // Append poster to body temporarily for rendering
-        document.body.appendChild(posterDiv);
-
-        // Use html2canvas to capture the poster as an image
-        html2canvas(posterDiv, {
-            scale: 1.5, // Reduced scale for smaller file size
-            useCORS: true, // Enable CORS for images
-            logging: false
-        }).then(canvas => {
-            // Create a download link for the image
-            const link = document.createElement('a');
-            link.download = `${studentName}_congratulations_poster.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-
-            // Remove poster from DOM after download
-            document.body.removeChild(posterDiv);
-        }).catch(error => {
-            console.error('Error generating poster:', error);
-            document.body.removeChild(posterDiv);
-        });
-    }
-
-    function logout() {
-        const loginFront = document.getElementById('loginFront');
-        const successBack = document.getElementById('successBack');
-        loginFront.className = '';
-        successBack.classList.add('hidden');
-        currentUser = null; // Clear the current user on logout
-    }
-
-    // Handle Enter key press for login
-    document.getElementById('username').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            login();
-        }
+    loginBtn.addEventListener('click', function(e) {
+      // prevent double-run since submit fires too
+      // event default prevented in submit handler
     });
-    document.getElementById('password').addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            login();
-        }
+
+    backBtn.addEventListener('click', function() {
+      logout();
     });
+
+    dlBtn.addEventListener('click', function() {
+      downloadCertificatePoster();
+    });
+  }
+
+  function doLogin() {
+    const name = document.getElementById('studentName').value;
+    const dob = document.getElementById('dob').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    if (!name) {
+      errorMsg.textContent = 'Please select your name.';
+      return;
+    }
+    if (!dob) {
+      errorMsg.textContent = 'Please enter your date of birth.';
+      return;
+    }
+
+    if (!students[name]) {
+      errorMsg.textContent = 'Student not found. Select a valid name.';
+      return;
+    }
+
+    // verify dob string (exact match)
+    if (students[name].dob !== dob) {
+      errorMsg.textContent = 'Incorrect date of birth. Please try again.';
+      return;
+    }
+
+    // success
+    errorMsg.textContent = '';
+    currentUser = name;
+    showResultForCurrentUser();
+    // hide login form and show result
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('resultWrap').style.display = 'block';
+    // hide the left top performers from dashboard - keep them only on home before login (as requested)
+    // We will keep the top performers on the home area — they remain unchanged; the dashboard only shows student
+    // (no need to hide home area but since user asked "home include much more details", keep top3 on home)
+    // If you want top performers to disappear after login uncomment below:
+    // document.getElementById('loginTopPerformers').classList.add('hidden');
+  }
+
+  function showResultForCurrentUser() {
+    if (!currentUser) return;
+    const s = students[currentUser];
+    const total = getTotal(s);
+    const percent = getPercentage(total);
+    const gradeInfo = getGradeInfo(percent);
+
+    // fill result panel
+    document.getElementById('resName').textContent = currentUser;
+    document.getElementById('resSub').textContent = 'Palazhi, Calicut';
+    document.getElementById('rHifz').textContent = s.hifz;
+    document.getElementById('rTajweed').textContent = s.tajweed;
+    document.getElementById('rQirath').textContent = s.qirath;
+    document.getElementById('rTotal').textContent = total;
+    document.getElementById('rPercent').textContent = percent.toFixed(2) + '%';
+
+    const statusText = document.getElementById('statusText');
+    const gradeBadge = document.getElementById('gradeBadge');
+    const gradeMessage = document.getElementById('gradeMessage');
+
+    statusText.textContent = (percent >= 40) ? 'Passed Successfully' : 'Needs Improvement';
+    gradeBadge.textContent = `Grade ${gradeInfo.grade}`;
+    gradeBadge.style.background = gradeInfo.color;
+    gradeMessage.textContent = gradeInfo.message;
+
+    // populate certificate hidden container as well
+    document.getElementById('certStudentName').textContent = currentUser;
+    document.getElementById('certHifz').textContent = s.hifz;
+    document.getElementById('certTajweed').textContent = s.tajweed;
+    document.getElementById('certQirath').textContent = s.qirath;
+    document.getElementById('certTotal').textContent = total;
+  }
+
+  function logout() {
+    currentUser = null;
+    // reset form view
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('resultWrap').style.display = 'none';
+    document.getElementById('errorMsg').textContent = '';
+  }
+
+  // ---------- CERTIFICATE / POSTER DOWNLOAD ----------
+  async function downloadCertificatePoster() {
+    // prepare certificate DOM already has values
+    const cert = document.getElementById('certificate');
+    // make it visible briefly for rendering
+    cert.style.display = 'block';
+
+    try {
+      const canvas = await html2canvas(cert, { scale: 2, backgroundColor: '#ffffff' });
+      const link = document.createElement('a');
+      const safeName = (currentUser || 'student').replace(/\s+/g,'_');
+      link.download = `${safeName}_certificate.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('error rendering certificate', err);
+      alert('Unable to generate certificate. See console for details.');
+    } finally {
+      // hide certificate again
+      cert.style.display = 'none';
+    }
+  }
 </script>
 </body>
 </html>
